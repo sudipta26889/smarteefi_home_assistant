@@ -1,0 +1,13 @@
+DOMAIN = "smarteefi_home_assistant"
+SMARTEEFI_API_URL = "https://www.smarteefi.com/api/v3"
+SMARTEEFI_EMAIL = "sudiptai26.889@gmail.com"
+SMARTEEFI_PASSWORD = "Sudipta@4919"
+
+CONF_MAP = "map"
+CONF_SWITCH_NAME = "switchname"
+CONF_DEVICE_NAME = "devicename"
+CONF_DEVICE_SERIAL = "serial"
+CONF_GROUP_ID = "group_id"
+CONF_IP = "ip"
+CONF_PORT = "port"
+CONF_SWITCHES = "switches"
