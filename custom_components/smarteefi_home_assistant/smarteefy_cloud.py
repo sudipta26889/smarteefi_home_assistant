@@ -5,15 +5,15 @@ from .const import *
 class SmarteefiAuthAPIResponse:
   _instance = None
 
-  def __new__(cls, *args, **kwargs):
+  def __new__(cls, email, password):
     if not cls._instance:
       cls._instance = super().__new__(cls)
       url = SMARTEEFI_API_URL + "/user/login"
 
       payload = json.dumps({
         "LoginForm": {
-          "email": SMARTEEFI_EMAIL,
-          "password": SMARTEEFI_PASSWORD,
+          "email": email,
+          "password": password,
           "app": "smarteefi"
         }
       })
@@ -28,18 +28,19 @@ class SmarteefiAuthAPIResponse:
 
 
 class SmarteefiAPI:
-  auth_response = SmarteefiAuthAPIResponse()
+  # auth_response = SmarteefiAuthAPIResponse()
 
-  def __init__(self, serialno, switchmap):
+  def __init__(self, access_token, serialno, switchmap):
     self.serialno = serialno
     self.switchmap = switchmap
+    self.access_token = access_token
 
   def getStatusFromServer(self, callback):
     # print(self.auth_response.response_json.get('access_token', ''))
     url = SMARTEEFI_API_URL + "/device/getstatus"
     payload = json.dumps({
       "DeviceStatus": {
-        "access_token": self.auth_response.response_json.get('access_token', ''),
+        "access_token": self.access_token,
         "serial": self.serialno,
         "switchmap": self.switchmap
       }
@@ -47,7 +48,6 @@ class SmarteefiAPI:
     headers = {
       'Content-Type': 'application/json',
     }
-    # response = await hass.async_add_executor_job(requests.request, "POST", url, headers=headers, data=payload)
     response = requests.request("POST", url, headers=headers, data=payload)
     callback(response.json())
 
@@ -56,7 +56,7 @@ class SmarteefiAPI:
 
     payload = json.dumps({
       "DeviceStatus": {
-        "access_token": self.auth_response.response_json.get('access_token', ''),
+        "access_token": self.access_token,
         "serial": self.serialno,
         "switchmap": self.switchmap,
         "statusmap": self.switchmap
@@ -73,7 +73,7 @@ class SmarteefiAPI:
 
     payload = json.dumps({
       "DeviceStatus": {
-        "access_token": self.auth_response.response_json.get('access_token', ''),
+        "access_token": self.access_token,
         "serial": self.serialno,
         "switchmap": self.switchmap,
         "statusmap": 0
@@ -84,3 +84,44 @@ class SmarteefiAPI:
     }
 
     requests.request("POST", url, headers=headers, data=payload)
+
+  @classmethod
+  def getDevices(cls, access_token):
+    url = SMARTEEFI_API_URL + "/user/devices"
+
+    payload = json.dumps({
+      "UserDevice": {
+        "access_token": access_token
+      }
+    })
+    headers = {
+      'Content-Type': 'application/json',
+    }
+
+    response = requests.request("POST", url, headers=headers, data=payload)
+    return response.json()
+
+  @classmethod
+  def getDeviceMoreInfo(cls, access_token, serial):
+    url = SMARTEEFI_API_URL + "/device/getstatus"
+    payload = json.dumps({
+      "DeviceStatus": {
+        "access_token": access_token,
+        "serial": serial,
+        "switchmap": 0
+      }
+    })
+    headers = {
+      'Content-Type': 'application/json',
+    }
+    response = requests.request("POST", url, headers=headers, data=payload)
+    response_json = response.json()
+    if response_json.get('result', 'error') == "success":
+      return response_json
+    else:
+      return cls.getDeviceMoreInfo(access_token, serial)
+
+
+
+
+
