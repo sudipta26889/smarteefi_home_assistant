@@ -5,7 +5,7 @@
   "documentation": "https://github.com/sudipta26889/smarteefi_home_assistant",
   "domain": "smarteefi_home_assistant",
   "iot_class": "cloud_polling",
-  "name": "Smarteefi Home Assistant Local",
+  "name": "Smarteefi HA Local",
   "requirements": [],
   "version": "1.0.0"
 }
