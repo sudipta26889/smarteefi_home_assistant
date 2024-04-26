@@ -12,24 +12,6 @@ import socket
 from .smarteefy_cloud import SmarteefiAPI, SmarteefiAuthAPIResponse
 
 
-# SWITCH_SCHEMA = vol.Schema(
-#     {
-#         vol.Required(CONF_MAP): cv.positive_int,
-#         vol.Required(CONF_SWITCH_NAME): cv.string
-#     }
-# )
-
-# PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
-#     {
-#         vol.Required(CONF_DEVICE_NAME): cv.string,
-#         vol.Required(CONF_DEVICE_SERIAL): cv.string,
-#         vol.Required(CONF_GROUP_ID): cv.positive_int,
-#         vol.Required(CONF_IP): cv.string,
-#         vol.Required(CONF_PORT): cv.positive_int,
-#         vol.Required(CONF_SWITCHES): vol.All(cv.ensure_list, [SWITCH_SCHEMA])
-#     }
-# )
-
 PLATFORM_SCHEMA = PLATFORM_SCHEMA.extend(
     {
         vol.Required('email'): cv.string,
@@ -66,13 +48,8 @@ async def async_setup_platform(
         for each_switch in cloud_response.get('switches', []):
             if each_switch['serial'] == each_module['serial']:
                 switches.append(
-                    SmarteefiSwitch(smarteefy_module, each_switch['map'], each_switch['name'])
+                    SmarteefiSwitch(smarteefy_module, each_switch['map'], each_switch['name'], smarteefy_cloud_auth.response_json.get('access_token', ''))
                 )
-        # switches = [SmarteefiSwitch(smarteefy_module, eachSwitchInModule[CONF_MAP], eachSwitchInModule[CONF_SWITCH_NAME]) for eachSwitchInModule in config[CONF_SWITCHES]]
-
-    # smarteefy_module = SmarteefyModule(config.get(CONF_DEVICE_NAME), config.get(CONF_DEVICE_SERIAL), config.get(CONF_GROUP_ID), config.get(CONF_IP), config.get(CONF_PORT))
-    # switches = [SmarteefiSwitch(smarteefy_module, eachSwitchInModule[CONF_MAP], eachSwitchInModule[CONF_SWITCH_NAME]) for eachSwitchInModule in config[CONF_SWITCHES]]
-
     for eachSwitch in switches:
         await hass.async_add_executor_job(eachSwitch.getStatusFromServer)
     async_add_entities(switches, update_before_add=True)
@@ -87,7 +64,7 @@ class SmarteefyModule:
 
 class SmarteefiSwitch(SwitchEntity):
 
-    def __init__(self, smarteefy_module: SmarteefyModule, map_id, switchname):
+    def __init__(self, smarteefy_module: SmarteefyModule, map_id, switchname, smarteefy_cloud_auth):
         self.type = "switch"
         self.map = map_id
         self.ownership = "owned"
@@ -98,7 +75,8 @@ class SmarteefiSwitch(SwitchEntity):
             f"Smarteefi {self.smarteefy_module.serial}-{self.map} Switch {self.switchname}"
         )
         self._attr_entity_id = smarteefy_module.serial + "-" + str(self.map)
-        self.cloud_api = SmarteefiAPI("WBOYmSnmQNFeCmeVvG1hNktmAmvb36XB_1703230151", self.smarteefy_module.serial, self.map)
+        # print(smarteefy_cloud_auth)
+        self.cloud_api = SmarteefiAPI(smarteefy_cloud_auth, self.smarteefy_module.serial, self.map)
         self.statusmap = 0
 
 
