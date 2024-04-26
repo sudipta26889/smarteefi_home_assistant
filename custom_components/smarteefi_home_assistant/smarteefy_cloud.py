@@ -114,12 +114,13 @@ class SmarteefiAPI:
     headers = {
       'Content-Type': 'application/json',
     }
+    # print("payload -> ", payload)
     response = requests.request("POST", url, headers=headers, data=payload)
     response_json = response.json()
-    if response_json.get('result', 'error') == "success":
-      return response_json
-    else:
-      return cls.getDeviceMoreInfo(access_token, serial)
+
+    if response_json.get('result', 'error') != "success":
+      print("getDeviceMoreInfo error response_json -> ", response_json)
+    return response_json
 
 
 

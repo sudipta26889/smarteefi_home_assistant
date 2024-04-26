@@ -43,13 +43,15 @@ async def async_setup_platform(
                 group_id = each_switch['group_id']
                 break
         more_device_info = await hass.async_add_executor_job(SmarteefiAPI.getDeviceMoreInfo, smarteefy_cloud_auth.response_json.get('access_token', ''), each_module['serial'])
+        
         # print(more_device_info)
-        smarteefy_module = SmarteefyModule(each_module['devname'], each_module['serial'], group_id, more_device_info['dev_ip'], more_device_info['dev_port'])
-        for each_switch in cloud_response.get('switches', []):
-            if each_switch['serial'] == each_module['serial']:
-                switches.append(
-                    SmarteefiSwitch(smarteefy_module, each_switch['map'], each_switch['name'], smarteefy_cloud_auth.response_json.get('access_token', ''))
-                )
+        if more_device_info.get('result', 'error') == "success":
+            smarteefy_module = SmarteefyModule(each_module['devname'], each_module['serial'], group_id, more_device_info['dev_ip'], more_device_info['dev_port'])
+            for each_switch in cloud_response.get('switches', []):
+                if each_switch['serial'] == each_module['serial']:
+                    switches.append(
+                        SmarteefiSwitch(smarteefy_module, each_switch['map'], each_switch['name'], smarteefy_cloud_auth.response_json.get('access_token', ''))
+                    )
     for eachSwitch in switches:
         await hass.async_add_executor_job(eachSwitch.getStatusFromServer)
     async_add_entities(switches, update_before_add=True)
