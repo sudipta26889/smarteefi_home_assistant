@@ -1,4 +1,5 @@
 DOMAIN = "smarteefi_home_assistant"
+MANUFACTURER = "Smarteefi"
 SMARTEEFI_API_URL = "https://www.smarteefi.com/api/v3"
 
 CONF_MAP = "map"

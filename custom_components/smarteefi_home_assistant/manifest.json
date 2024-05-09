@@ -1,11 +1,13 @@
 {
   "codeowners": ["@sudipta26889"],
-  "config_flow": false,
+  "config_flow": true,
   "dependencies": [],
   "documentation": "https://github.com/sudipta26889/smarteefi_home_assistant",
   "domain": "smarteefi_home_assistant",
   "iot_class": "cloud_polling",
   "name": "Smarteefi HA Local",
   "requirements": [],
-  "version": "1.0.0"
+  "version": "1.0.0",
+  "description": "Integration for Smarteefi devices in Home Assistant.",
+  "icon": "icon.png"
 }

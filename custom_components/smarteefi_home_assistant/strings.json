@@ -1,0 +1,15 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "Add Smarteefi Retrofit Smart Node",
+        "description": "Get the local ip from your router. This is needed for local communication",
+        "data": {
+          "serial": "Serial",
+          "devname": "Room Name",
+          "ip": "Device IP"
+        }
+      }
+    }
+  }
+}
